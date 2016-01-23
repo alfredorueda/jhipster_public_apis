@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="bower_components/angular/angular.js"></script>
+    <script src="bower_components/angular-resource/angular-resource.js"></script>
+</head>
+<body>
+    <style>
+        table, th , td  {
+            border-collapse: collapse;
+            padding: 5px;
+        }
+    </style>
+    <div ng-app="myApp" ng-controller="creacionCtrl">
+        <div>
+            <form name="formJugador" ng-submit="save()">
+                Nombre: <input type="text" name="nombre" ng-model="jugador.nombre" required/>
+                <span ng-show="formJugador.nombre.$touched && formJugador.nombre.$invalid">El nombre es requerido</span><br/>
+
+                Posicion: <input type="text" name="posicion" ng-model="jugador.posicion" required/>
+                <span ng-show="formJugador.posicion.$touched && formJugador.posicion.$invalid">La posicion es requerida</span><br/>
+
+                Asistencias Totales: <input type="number" name="asistenciasTotales" ng-model="jugador.asistenciasTotales" required/>
+                <span ng-show="formJugador.asistenciasTotales.$touched && formJugador.asistenciasTotales.$invalid">Requerido</span><br/>
+
+                Canastas Totales: <input type="number" name="canastasTotales" ng-model="jugador.canastasTotales" required/>
+                <span ng-show="formJugador.canastasTotales.$touched && formJugador.canastasTotales.$invalid">Requerido</span><br/>
+
+                <button type="submit" ng-disabled="formJugador.$invalid || isSaving">
+                    <span>Save</span>
+                </button>
+            </form>
+        </div>
+    </div>
+    <script>
+        var app = angular.module('myApp', ['ngResource']);
+        app.controller('creacionCtrl', function($scope, Jugador) {
+            $scope.jugador;
+            $scope.save = function () {
+                $scope.isSaving = true;
+                Jugador.save($scope.jugador, onSaveSuccess, onSaveError);
+            };
+            var onSaveSuccess = function (result) {
+                $scope.isSaving = false;
+            };
+            var onSaveError = function (result) {
+                $scope.isSaving = false;
+            };
+        });
+        app.factory("Jugador",function($resource){
+            return $resource('api/jugadors/:id', {}, {
+                'save': {
+                    method: 'POST',
+                    transformRequest: function (data) {
+                        return angular.toJson(data);
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
